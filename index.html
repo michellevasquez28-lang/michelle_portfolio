@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Michelle Vasquez — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;cursor:none!important;}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;overflow:hidden;width:100vw;height:100vh;background:#fff;}
+
+/* ── CUSTOM CURSOR ── */
+#custom-cursor{
+  position:fixed;top:0;left:0;
+  pointer-events:none;z-index:99999;
+  background:transparent;
+}
+#custom-cursor svg{display:block;}
+
+/* ── TITLE SCREEN ── */
+#title-screen{
+  position:fixed;inset:0;z-index:1000;
+  background:#fff;
+  transition:opacity 0.7s ease;
+  overflow:hidden;
+}
+#title-screen.fade-out{opacity:0;pointer-events:none;}
+#title-screen > img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:block;z-index:0;
+}
+/* Enter button sits invisibly over the blue button already baked into titlescreen.png */
+.enter-btn{
+  position:absolute;
+  left:50%;top:63.5%;
+  transform:translate(-50%,-50%);
+  z-index:1;
+  width:26%;height:9.5%;
+  background:transparent;border:none;
+  color:transparent;box-shadow:none;
+  cursor:none;
+}
+
+/* traffic light dots (finder windows only, not title screen) */
+.tl{width:13px;height:13px;border-radius:50%;border:1px solid rgba(0,0,0,0.2);flex-shrink:0;}
+.tl-r{background:#ff5f57;} .tl-y{background:#ffbd2e;} .tl-g{background:#28c840;}
+
+/* ── DESKTOP ── */
+#desktop{position:fixed;inset:0;display:none;flex-direction:column;}
+#desktop.visible{display:flex;}
+
+/* Menu Bar */
+#menubar{
+  position:relative;z-index:100;background:#1a1a1a;
+  height:27px;display:flex;align-items:center;padding:0 12px;flex-shrink:0;
+}
+.menu-left{display:flex;align-items:center;gap:14px;color:#fff;font-size:13px;}
+.menu-left .app-name{font-weight:700;}
+.menu-center{
+  position:absolute;left:50%;transform:translateX(-50%);
+  display:flex;gap:10px;align-items:center;
+}
+.googly-eye{
+  width:22px;height:22px;background:#fff;border-radius:50%;
+  border:2px solid #555;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.pupil{
+  width:9px;height:9px;background:#111;border-radius:50%;
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+}
+.menu-right{margin-left:auto;display:flex;align-items:center;gap:10px;color:#fff;}
+#clock{font-size:12px;color:#fff;}
+
+/* FIX 5 — all menu bar icons same 16px height, undistorted */
+.menu-icon{
+  width:16px;height:16px;
+  object-fit:contain;display:block;
+  filter:brightness(0) invert(1);
+}
+.menu-icon-svg{
+  width:16px;height:16px;
+  display:block;flex-shrink:0;
+}
+
+/* Desktop background — wallpaper sits ON #desktop itself so
+   transparent PNG pixels always composite against the photo, never
+   against the white body background */
+#desktop{
+  background:url('./wallpaper.png') center/cover no-repeat !important;
+}
+/* #desktop-bg is kept for backwards compat but hidden */
+#desktop-bg{ display:none; }
+
+/* ── DESKTOP ICONS ──
+   FIX 1: PNGs have real alpha — no mix-blend-mode needed,
+   no background on img or wrapper so transparency is fully visible */
+#icons-container{
+  position:absolute;inset:27px 0 0 0;
+  z-index:10;pointer-events:none;
+  background:transparent;
+}
+.desktop-icon{
+  position:absolute;display:flex;flex-direction:column;
+  align-items:center;gap:5px;pointer-events:all;
+  padding:4px;border-radius:6px;
+  transition:transform 0.15s;width:116px;
+}
+.desktop-icon:hover{
+  transform:scale(1.08);
+  background:rgba(255,255,255,0.15);
+}
+.desktop-icon img{
+  width:100px;height:100px;
+  object-fit:contain;display:block;
+  background:transparent;
+}
+.icon-label{
+  font-size:10px;color:#fff;
+  text-shadow:0 1px 4px rgba(0,0,0,0.95),0 0 8px rgba(0,0,0,0.7);
+  text-align:center;line-height:1.3;max-width:96px;word-break:break-word;
+}
+
+/* ── CORNER CHARACTER ── */
+#corner-character{
+  position:absolute;bottom:16px;right:18px;
+  z-index:20;display:flex;align-items:flex-end;gap:10px;
+}
+.speech-bubble{
+  background:#fff;border:3px solid #111;
+  padding:11px 14px;font-family:'Press Start 2P',monospace;
+  font-size:7.5px;line-height:1.7;max-width:185px;
+  position:relative;margin-bottom:110px;
+  border-radius:14px;
+}
+.speech-bubble::after{
+  content:'';position:absolute;bottom:-19px;right:16px;
+  width:0;height:0;
+  border-left:10px solid transparent;border-right:10px solid transparent;
+  border-top:19px solid #111;
+}
+.speech-bubble::before{
+  content:'';position:absolute;bottom:-14px;right:19px;
+  width:0;height:0;
+  border-left:7px solid transparent;border-right:7px solid transparent;
+  border-top:14px solid #fff;z-index:1;
+}
+.face-container{
+  width:220px;height:220px;flex-shrink:0;
+  background:transparent;
+  /* no border-radius/overflow:hidden — shows full face */
+}
+.face-container canvas{
+  width:100%;height:100%;display:block;
+  transform:scale(1.9) translateY(-22%);
+  transform-origin:center top;
+}
+
+/* ── FIX 7 — COMMENT ICON (bottom-left, always visible) ── */
+@keyframes commentBounce{
+  0%,100%{transform:translateY(0);}
+  40%{transform:translateY(-10px);}
+  60%{transform:translateY(-5px);}
+}
+#comment-icon{
+  position:fixed;bottom:20px;left:20px;
+  z-index:100;width:80px;height:80px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:transform 0.1s;
+}
+#comment-icon:hover{animation:commentBounce 0.5s cubic-bezier(0.36,0.07,0.19,0.97) infinite;}
+#comment-icon svg{
+  width:80px;height:80px;
+  filter:drop-shadow(0 3px 10px rgba(0,0,0,0.8));
+}
+.comment-tooltip{
+  position:absolute;bottom:110%;left:0;transform:none;
+  background:#111;color:#fff;
+  font-family:'Press Start 2P',monospace;font-size:7px;
+  padding:5px 9px;border-radius:8px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity 0.15s;
+  z-index:101;
+}
+#comment-icon:hover .comment-tooltip{opacity:1;}
+
+/* ── FIX 7 — COMMENT OVERLAY: Notepad + AIM ── */
+#comment-overlay{
+  position:fixed;
+  top:12%;left:50%;
+  transform:translateX(-50%);
+  display:none;
+  z-index:500;
+  align-items:flex-start;
+  /* buddy list peek requires relative positioning context */
+  position:fixed;
+}
+#comment-overlay.open{display:flex;}
+
+/* Windows 98–style Notepad panel */
+#win-notepad{
+  width:430px;
+  background:#c0c0c0;
+  border-top:2px solid #fff;
+  border-left:2px solid #fff;
+  border-right:2px solid #808080;
+  border-bottom:2px solid #808080;
+  box-shadow:4px 4px 0 #000;
+  font-family:'Courier New',monospace;
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+}
+.win98-titlebar{
+  background:linear-gradient(to right,#000080,#1084d0);
+  color:#fff;padding:3px 6px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:'Courier New',monospace;font-size:12px;font-weight:700;
+  user-select:none;
+}
+.win98-titlebar-left{display:flex;align-items:center;gap:5px;}
+.win98-ctrls{display:flex;gap:2px;}
+.win98-btn{
+  width:16px;height:14px;background:#c0c0c0;
+  border-top:1px solid #fff;border-left:1px solid #fff;
+  border-right:1px solid #808080;border-bottom:1px solid #808080;
+  font-size:10px;display:flex;align-items:center;justify-content:center;
+  color:#000;font-family:Arial,sans-serif;cursor:pointer;line-height:1;
+}
+.win98-btn:hover{background:#e0e0e0;}
+.win98-btn:active{
+  border-top:1px solid #808080;border-left:1px solid #808080;
+  border-right:1px solid #fff;border-bottom:1px solid #fff;
+}
+.win98-menubar{
+  display:flex;background:#c0c0c0;
+  border-bottom:1px solid #808080;
+}
+.win98-mitem{
+  padding:2px 8px;font-size:12px;
+  font-family:'Courier New',monospace;
+}
+.win98-mitem:hover{background:#000080;color:#fff;}
+.np-textarea{
+  display:block;width:calc(100% - 8px);margin:4px;height:220px;
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  padding:6px;
+  font-family:'Courier New',monospace;font-size:12px;
+  resize:none;outline:none;background:#fff;color:#000;
+  overflow-y:scroll;
+}
+.np-statusbar{
+  background:#c0c0c0;
+  border-top:1px solid #808080;
+  padding:3px 8px;font-size:11px;
+  font-family:'Courier New',monospace;
+  display:flex;justify-content:flex-end;align-items:center;
+  gap:8px;
+}
+.np-send-btn{
+  background:#00c8f0;
+  border-top:2px solid #aaddff;border-left:2px solid #aaddff;
+  border-right:2px solid #0088aa;border-bottom:2px solid #0088aa;
+  padding:4px 12px;font-family:'Courier New',monospace;
+  font-size:11px;font-weight:700;color:#fff;cursor:pointer;
+}
+.np-send-btn:active{
+  border-top:2px solid #0088aa;border-left:2px solid #0088aa;
+  border-right:2px solid #aaddff;border-bottom:2px solid #aaddff;
+}
+
+/* AIM Instant Message window */
+#win-aim{
+  width:310px;
+  background:#c0c0c0;
+  border-top:2px solid #fff;
+  border-left:2px solid #fff;
+  border-right:2px solid #808080;
+  border-bottom:2px solid #808080;
+  box-shadow:4px 4px 0 #000;
+  flex-shrink:0;
+  position:relative;z-index:3;
+  margin-left:-2px;
+  display:flex;flex-direction:column;
+}
+.aim-titlebar{
+  background:linear-gradient(to right,#000080,#1084d0);
+  color:#fff;padding:3px 6px;font-size:12px;font-weight:700;
+  font-family:'Courier New',monospace;
+  display:flex;align-items:center;justify-content:space-between;
+  user-select:none;
+}
+.aim-title-left{display:flex;align-items:center;gap:5px;}
+.aim-menubar{
+  display:flex;background:#c0c0c0;
+  border-bottom:1px solid #808080;
+}
+.aim-mitem{
+  padding:2px 8px;font-size:12px;
+  font-family:'Courier New',monospace;
+}
+.aim-mitem:hover{background:#000080;color:#fff;}
+.aim-to-row{
+  background:#c0c0c0;padding:3px 6px;
+  font-size:11px;font-family:'Courier New',monospace;
+  border-bottom:1px solid #808080;
+}
+.aim-chat{
+  background:#fff;margin:3px;
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  padding:6px;height:170px;overflow-y:auto;
+  font-family:'Courier New',monospace;font-size:11px;line-height:1.5;
+}
+.aim-line{margin-bottom:2px;}
+.aim-a{color:#cc3300;font-weight:700;}
+.aim-b{color:#000066;font-weight:700;}
+.aim-input-area{
+  background:#c0c0c0;padding:3px;
+  border-top:1px solid #808080;
+}
+.aim-input-bar{
+  width:100%;
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  padding:2px 4px;font-size:11px;
+  font-family:'Courier New',monospace;background:#fff;outline:none;
+}
+/* AIM toolbar at bottom */
+.aim-toolbar{
+  display:flex;align-items:center;gap:3px;flex-wrap:wrap;
+  background:#c0c0c0;padding:3px 4px;
+  border-top:1px solid #808080;
+}
+.aim-tbtn{
+  font-size:9px;font-family:'Courier New',monospace;
+  background:#c0c0c0;
+  border-top:1px solid #fff;border-left:1px solid #fff;
+  border-right:1px solid #808080;border-bottom:1px solid #808080;
+  padding:2px 6px;cursor:pointer;color:#000;white-space:nowrap;
+}
+.aim-tbtn:hover{background:#e8e8e8;}
+.aim-tbtn:active{
+  border-top:1px solid #808080;border-left:1px solid #808080;
+  border-right:1px solid #fff;border-bottom:1px solid #fff;
+}
+.aim-tbtn.send{
+  background:#00c8f0;color:#fff;font-weight:700;
+  border-top:1px solid #aaddff;border-left:1px solid #aaddff;
+  border-right:1px solid #0088aa;border-bottom:1px solid #0088aa;
+}
+
+/* Buddy List peeking behind AIM window */
+#win-buddylist{
+  position:absolute;
+  right:-90px;top:24px;
+  width:180px;
+  background:#c0c0c0;
+  border-top:2px solid #fff;border-left:2px solid #fff;
+  border-right:2px solid #808080;border-bottom:2px solid #808080;
+  box-shadow:3px 3px 0 #000;
+  z-index:1;
+  font-family:'Courier New',monospace;font-size:11px;
+}
+.bl-titlebar{
+  background:linear-gradient(to right,#000080,#1084d0);
+  color:#fff;padding:2px 5px;font-size:11px;font-weight:700;
+  font-family:'Courier New',monospace;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.bl-menubar{display:flex;background:#c0c0c0;border-bottom:1px solid #808080;}
+.bl-mitem{padding:1px 6px;font-size:10px;}
+.bl-body{padding:4px 6px;}
+.bl-section{
+  font-size:10px;font-weight:700;color:#333;
+  margin:3px 0 2px;cursor:pointer;
+}
+.bl-item{padding:1px 8px;font-size:11px;}
+.bl-online{color:#006600;}
+.bl-offline{color:#888;}
+
+/* ── FINDER WINDOWS ── */
+.finder-window{
+  position:fixed;min-width:500px;min-height:340px;
+  background:#f0eeec;border-radius:8px;
+  box-shadow:0 10px 50px rgba(0,0,0,0.45);
+  z-index:200;display:none;flex-direction:column;
+  overflow:hidden;border:1px solid #999;
+}
+.finder-window.open{display:flex;}
+.finder-titlebar{
+  background:linear-gradient(to bottom,#e0dbd3,#c8c3bb);
+  padding:7px 10px;display:flex;align-items:center;gap:6px;
+  border-bottom:1px solid #aaa;cursor:move;user-select:none;flex-shrink:0;
+}
+.finder-titlebar .tl{cursor:pointer;}
+.finder-title{
+  flex:1;text-align:center;font-size:12px;font-weight:600;color:#333;
+}
+.finder-body{display:flex;flex:1;overflow:hidden;}
+.finder-sidebar{
+  width:150px;background:#e8e4e0;border-right:1px solid #c0bdb8;
+  padding:8px 0;flex-shrink:0;overflow-y:auto;
+}
+.sb-header{
+  font-size:10px;font-weight:700;color:#888;
+  text-transform:uppercase;padding:2px 12px;
+  letter-spacing:0.5px;margin-top:6px;
+}
+.sb-item{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 12px;font-size:12px;color:#333;
+  border-radius:4px;margin:1px 4px;
+}
+.sb-item.active{background:#3a7bd5;color:#fff;}
+.finder-content{flex:1;padding:18px;overflow-y:auto;background:#fff;}
+
+/* Project windows — retro Y2K Geocities style */
+.concept-tags{
+  display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 8px;
+}
+.ctag{
+  font-family:'Courier New',monospace;font-size:9px;font-weight:700;
+  padding:2px 6px;border:1px solid currentColor;
+  letter-spacing:0.5px;text-transform:uppercase;
+  display:inline-block;
+}
+.proj-case-section{
+  margin-top:12px;border-top:2px groove #808080;padding-top:10px;
+}
+.proj-case-section h4{
+  font-family:'Courier New',monospace;font-size:11px;font-weight:700;
+  color:inherit;margin:0 0 3px;text-transform:uppercase;letter-spacing:1px;
+}
+.proj-case-section p{
+  font-family:'Courier New',monospace;font-size:11px;color:#000;
+  line-height:1.5;margin:0 0 8px;
+}
+#win-proj1 .finder-content,#win-proj2 .finder-content,#win-proj3 .finder-content,#win-proj4 .finder-content,#win-proj5 .finder-content{overflow-y:auto;padding:20px;}
+.proj-title{
+  font-size:16px;font-weight:700;color:#000080;margin-bottom:4px;
+  font-family:'Courier New',monospace;border-bottom:2px solid #000080;
+  padding-bottom:4px;
+}
+.proj-sub{font-size:11px;color:#555;margin-bottom:8px;font-family:'Courier New',monospace;}
+.proj-tag{
+  display:inline-block;
+  background:#000080;color:#ffff00;
+  font-size:9px;padding:2px 8px;
+  font-family:'Courier New',monospace;
+  border:1px solid #000;
+  margin-bottom:12px;letter-spacing:1px;
+}
+.proj-meta{
+  background:#ffffd0;
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  padding:8px 10px;
+  margin-bottom:12px;font-size:11px;color:#000;
+  font-family:'Courier New',monospace;
+}
+.proj-meta div{margin-bottom:3px;}
+.proj-meta strong{color:#000080;}
+.proj-divider{border:none;border-top:2px groove #808080;margin:10px 0;}
+.proj-body{font-size:12px;color:#000;line-height:1.6;font-family:'Courier New',monospace;}
+.proj-body p{margin-bottom:10px;}
+.proj-body strong{color:#000080;}
+.stat-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+.stat-box{
+  background:#c0c0c0;
+  border-top:2px solid #fff;border-left:2px solid #fff;
+  border-right:2px solid #808080;border-bottom:2px solid #808080;
+  padding:6px 12px;text-align:center;min-width:80px;
+}
+.stat-box strong{display:block;font-size:18px;color:#000080;font-family:'Courier New',monospace;}
+.stat-box span{font-size:10px;color:#333;font-family:'Courier New',monospace;}
+.pdf-link{
+  display:inline-block;margin-top:10px;padding:5px 14px;
+  background:#000080;color:#fff;
+  text-decoration:none;font-size:11px;font-weight:700;
+  font-family:'Courier New',monospace;
+  border-top:2px solid #aaaaff;border-left:2px solid #aaaaff;
+  border-right:2px solid #000040;border-bottom:2px solid #000040;
+}
+.pdf-link:hover{background:#0000cc;}
+.pdf-link:active{
+  border-top:2px solid #000040;border-left:2px solid #000040;
+  border-right:2px solid #aaaaff;border-bottom:2px solid #aaaaff;
+}
+
+/* Music player — Windows 98 / WinAmp style */
+#win-music{
+  border-radius:0 !important;
+  border-top:2px solid #fff !important;
+  border-left:2px solid #fff !important;
+  border-right:2px solid #808080 !important;
+  border-bottom:2px solid #808080 !important;
+  box-shadow:4px 4px 0 #000 !important;
+  background:#c0c0c0 !important;
+  min-height:unset !important; min-width:unset !important;
+}
+#win-music .finder-titlebar{
+  background:#006633 !important;
+  border-radius:0 !important;
+  padding:4px 8px !important;
+  border-bottom:2px solid #004422 !important;
+}
+#win-music .finder-title{
+  color:#fff !important;
+  font-family:'Press Start 2P',monospace !important;
+  font-size:11px !important;
+  font-weight:400 !important;
+}
+#win-music .tl-r{ display:none; }
+#win-music .tl-y{ display:none; }
+#win-music .tl-g{ display:none; }
+.music-close-btn{
+  width:16px;height:14px;background:#c0c0c0;
+  border-top:1px solid #fff;border-left:1px solid #fff;
+  border-right:1px solid #808080;border-bottom:1px solid #808080;
+  font-size:10px;display:flex;align-items:center;justify-content:center;
+  color:#000;font-family:Arial,sans-serif;cursor:pointer;margin-left:auto;
+  flex-shrink:0;
+}
+.music-close-btn:active{
+  border-top:1px solid #808080;border-left:1px solid #808080;
+  border-right:1px solid #fff;border-bottom:1px solid #fff;
+}
+.music-body{
+  padding:10px;background:#c0c0c0;
+  display:flex;flex-direction:column;gap:8px;
+}
+.music-top{display:flex;gap:10px;}
+.music-art-wrap{
+  position:relative;flex-shrink:0;
+  width:190px;height:190px;
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  overflow:hidden;background:#000;
+}
+.music-art-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.music-art-caption{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,0.65);color:#fff;
+  font-family:'Courier New',monospace;font-size:10px;
+  padding:4px 6px;
+}
+.music-controls{
+  display:flex;flex-direction:column;gap:6px;flex:1;
+}
+.music-icons-row{
+  display:flex;gap:8px;align-items:flex-start;
+}
+.music-cd{
+  width:52px;height:52px;flex-shrink:0;
+}
+.music-vol{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.vol-btn{
+  width:22px;height:18px;
+  background:#c0c0c0;
+  border-top:1px solid #fff;border-left:1px solid #fff;
+  border-right:1px solid #808080;border-bottom:1px solid #808080;
+  font-size:13px;font-weight:700;display:flex;align-items:center;
+  justify-content:center;color:#000;font-family:Arial,sans-serif;
+  cursor:pointer;
+}
+.vol-btn:active{
+  border-top:1px solid #808080;border-left:1px solid #808080;
+  border-right:1px solid #fff;border-bottom:1px solid #fff;
+}
+.vol-track{
+  width:10px;height:50px;background:#c0c0c0;
+  border-top:1px solid #808080;border-left:1px solid #808080;
+  border-right:1px solid #fff;border-bottom:1px solid #fff;
+  position:relative;
+}
+.vol-fill{
+  position:absolute;bottom:0;left:0;right:0;height:65%;
+  background:#00aa44;
+}
+.music-cassette{
+  width:52px;height:36px;flex-shrink:0;margin-top:4px;
+}
+.music-btns-row{
+  display:flex;gap:4px;flex-wrap:wrap;
+}
+.mctl-btn{
+  width:34px;height:28px;
+  background:#c0c0c0;
+  border-top:2px solid #fff;border-left:2px solid #fff;
+  border-right:2px solid #808080;border-bottom:2px solid #808080;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;cursor:pointer;
+  color:#000;
+}
+.mctl-btn:active{
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+}
+.mctl-btn.wide{width:auto;padding:0 8px;font-size:11px;font-family:'Courier New',monospace;}
+.mctl-btn.heart{color:#cc0000;}
+.music-field-row{
+  display:flex;align-items:center;gap:6px;
+  font-family:'Courier New',monospace;font-size:12px;color:#000;
+}
+.music-field-label{width:44px;text-align:right;font-weight:700;}
+.music-field{
+  flex:1;height:22px;
+  background:#fff;
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  padding:2px 6px;
+  font-family:'Courier New',monospace;font-size:12px;
+  display:flex;align-items:center;
+  letter-spacing:2px;
+}
+.music-dropdown{
+  width:20px;height:22px;
+  background:#c0c0c0;
+  border-top:1px solid #fff;border-left:1px solid #fff;
+  border-right:1px solid #808080;border-bottom:1px solid #808080;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;cursor:pointer;flex-shrink:0;
+}
+.music-progress-row{
+  display:flex;align-items:center;gap:6px;
+  font-family:'Courier New',monospace;font-size:11px;color:#000;
+}
+.music-time{width:30px;text-align:center;}
+.music-progress-track{
+  flex:1;height:16px;
+  background:#c0c0c0;
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  position:relative;
+}
+.music-progress-fill{
+  position:absolute;left:0;top:0;bottom:0;width:46%;
+  background:#808080;
+}
+.music-progress-thumb{
+  position:absolute;top:50%;left:46%;transform:translate(-50%,-50%);
+  width:12px;height:14px;
+  background:#c0c0c0;
+  border-top:1px solid #fff;border-left:1px solid #fff;
+  border-right:1px solid #808080;border-bottom:1px solid #808080;
+}
+
+/* About Me window */
+#win-about .finder-content{padding:0;background:#cc2200;display:block;}
+.am-inner{background:#fff;border-radius:3px;margin:16px;overflow:hidden;}
+.am-bar{
+  background:linear-gradient(to bottom,#e8e4dc,#c8c4bc);
+  padding:5px 8px;display:flex;align-items:center;gap:5px;
+  border-bottom:1px solid #aaa;
+}
+.am-text{
+  background:#1144cc;padding:22px;color:#fff;
+  font-family:'Courier New',monospace;
+  font-size:13px;font-weight:700;line-height:1.6;
+}
+.am-text p{margin-bottom:14px;}
+.am-text p:last-child{margin-bottom:0;}
+
+/* Tools — no window chrome, just the floating green circle */
+#win-tools{
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  min-width:unset!important;min-height:unset!important;
+}
+#win-tools .finder-titlebar{
+  background:transparent!important;
+  border-bottom:none!important;
+}
+#win-tools .finder-titlebar .finder-title{display:none;}
+#win-tools .finder-content{
+  padding:0;background:transparent;
+  display:flex;align-items:center;justify-content:center;
+}
+#win-tools .finder-content img{
+  width:400px;height:400px;
+  object-fit:contain;display:block;
+}
+
+/* Currently reading — override global min-width so 420px inline style is respected */
+#win-reading{
+  overflow:hidden;
+  min-width:unset!important;
+  min-height:unset!important;
+}
+#win-reading .finder-content{
+  padding:0;background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  flex:1;min-height:0;
+  overflow:hidden;
+}
+#win-reading .finder-content img{
+  width:100%;height:100%;
+  display:block;
+  object-fit:contain;
+}
+
+/* Writing window retro overrides */
+#win-writing .finder-sidebar{background:#c0c0c0;border-right:2px solid #808080;}
+#win-writing .sb-header{color:#000080;font-family:'Courier New',monospace;font-weight:700;font-size:10px;letter-spacing:1px;}
+#win-writing .sb-item{font-family:'Courier New',monospace;font-size:11px;color:#000;border-radius:0;}
+#win-writing .sb-item.active{background:#000080;color:#fff;}
+#win-writing .finder-body{background:#c0c0c0;}
+
+/* Writing */
+.sr-item{
+  padding:8px 16px;color:#ccc;font-size:12px;cursor:pointer;
+  border-bottom:1px solid #333;
+}
+.sr-item:hover{background:#333;color:#fff;}
+.sr-label{color:#888;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:6px 16px 2px;}
+.sr-none{padding:12px 16px;color:#888;font-size:12px;font-style:italic;}
+.writing-list{list-style:none;background:#c0c0c0;}
+.writing-item{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 8px;border-bottom:1px solid #808080;
+  font-size:12px;color:#000;text-decoration:none;
+  font-family:'Courier New',monospace;
+}
+.writing-item:nth-child(even){background:#d4d0c8;}
+.writing-item:hover{background:#000080;color:#fff;}
+.writing-item:hover .file-type{color:#ffff00;}
+.writing-item:hover .file-ico{color:#fff;}
+.file-ico{font-size:13px;font-family:'Courier New',monospace;color:#000080;font-weight:700;flex-shrink:0;}
+.file-name{flex:1;font-weight:700;}
+.file-type{font-size:10px;color:#808080;font-family:'Courier New',monospace;}
+
+/* Window size states */
+.finder-window.win-lg{
+  width:min(88vw,1000px)!important;
+  height:min(82vh,700px)!important;
+}
+
+/* Comment list */
+.comment-list{
+  background:#fff;margin:4px;
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  padding:6px;height:120px;overflow-y:auto;
+  font-family:'Courier New',monospace;font-size:11px;
+}
+.np-name-input{
+  display:block;width:calc(100% - 8px);margin:4px;
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  padding:4px 6px;
+  font-family:'Courier New',monospace;font-size:11px;
+  outline:none;background:#fff;color:#000;
+}
+.comment-entry{
+  border-bottom:1px dotted #ccc;padding:4px 0;
+  line-height:1.4;
+}
+.comment-entry:last-child{border-bottom:none;}
+.comment-date{color:#888;font-size:10px;display:block;margin-bottom:2px;}
+.comment-name{color:#000080;font-weight:700;font-size:11px;}
+.comment-empty{color:#aaa;font-style:italic;font-size:11px;padding:4px;}
+
+
+#win-proj1 .ctag{color:#4a5c14;border-color:#4a5c14;}
+#win-proj2 .ctag{color:#a84c18;border-color:#a84c18;}
+#win-proj3 .ctag{color:#2e6070;border-color:#2e6070;}
+#win-proj4 .ctag{color:#606810;border-color:#606810;}
+#win-proj5 .ctag{color:#943820;border-color:#943820;}
+/* Per-project retro color themes — pulled directly from wallpaper palette
+   Wallpaper: olive-yellow greens (#727e2b, #667709), warm cream (#fef0de),
+              dusty blue (#7f9dbb), beige (#e1d1c1), terracotta (#b34f2d) */
+
+/* Project 1 — Muted olive (wallpaper center mass) */
+#win-proj1 .proj-title{color:#4a5c14;border-bottom-color:#4a5c14;}
+#win-proj1 .proj-tag{background:#4a5c14;color:#eef2d8;}
+#win-proj1 .proj-meta{background:#eef2d8;border-top-color:#8ea840;border-left-color:#8ea840;border-right-color:#ccd89c;border-bottom-color:#ccd89c;}
+#win-proj1 .proj-meta strong{color:#4a5c14;}
+#win-proj1 .proj-body strong{color:#4a5c14;}
+#win-proj1 .stat-box{background:#d8e4a8;}
+#win-proj1 .stat-box strong{color:#4a5c14;}
+#win-proj1 .pdf-link{background:#4a5c14;border-top-color:#8ec038;border-left-color:#8ec038;border-right-color:#242e0a;border-bottom-color:#242e0a;}
+#win-proj1 .pdf-link:hover{background:#5e7420;}
+#win-proj1 .proj-divider{border-top-color:#8ea840;}
+
+/* Project 2 — Warm amber (wallpaper cream + terracotta warmth) */
+#win-proj2 .proj-title{color:#a84c18;border-bottom-color:#a84c18;}
+#win-proj2 .proj-tag{background:#a84c18;color:#fef0de;}
+#win-proj2 .proj-meta{background:#faecd8;border-top-color:#d49060;border-left-color:#d49060;border-right-color:#f0d0b4;border-bottom-color:#f0d0b4;}
+#win-proj2 .proj-meta strong{color:#a84c18;}
+#win-proj2 .proj-body strong{color:#a84c18;}
+#win-proj2 .stat-box{background:#f0d8c0;}
+#win-proj2 .stat-box strong{color:#a84c18;}
+#win-proj2 .pdf-link{background:#a84c18;border-top-color:#d88050;border-left-color:#d88050;border-right-color:#542608;border-bottom-color:#542608;}
+#win-proj2 .pdf-link:hover{background:#c86028;}
+#win-proj2 .proj-divider{border-top-color:#d49060;}
+
+/* Project 3 — Dusty slate-teal (wallpaper top-center blue) */
+#win-proj3 .proj-title{color:#2e6070;border-bottom-color:#2e6070;}
+#win-proj3 .proj-tag{background:#2e6070;color:#d8eef4;}
+#win-proj3 .proj-meta{background:#d8eef4;border-top-color:#609cb8;border-left-color:#609cb8;border-right-color:#b0d4e4;border-bottom-color:#b0d4e4;}
+#win-proj3 .proj-meta strong{color:#2e6070;}
+#win-proj3 .proj-body strong{color:#2e6070;}
+#win-proj3 .stat-box{background:#b8d8e8;}
+#win-proj3 .stat-box strong{color:#2e6070;}
+#win-proj3 .pdf-link{background:#2e6070;border-top-color:#58a0c0;border-left-color:#58a0c0;border-right-color:#143040;border-bottom-color:#143040;}
+#win-proj3 .pdf-link:hover{background:#3c7888;}
+#win-proj3 .proj-divider{border-top-color:#609cb8;}
+
+/* Project 4 — Golden olive (wallpaper bot-center yellows) */
+#win-proj4 .proj-title{color:#606810;border-bottom-color:#606810;}
+#win-proj4 .proj-tag{background:#606810;color:#f0f0d0;}
+#win-proj4 .proj-meta{background:#eeeed4;border-top-color:#9ca040;border-left-color:#9ca040;border-right-color:#d8d8a8;border-bottom-color:#d8d8a8;}
+#win-proj4 .proj-meta strong{color:#606810;}
+#win-proj4 .proj-body strong{color:#606810;}
+#win-proj4 .stat-box{background:#d8d8a8;}
+#win-proj4 .stat-box strong{color:#606810;}
+#win-proj4 .pdf-link{background:#606810;border-top-color:#98a830;border-left-color:#98a830;border-right-color:#303408;border-bottom-color:#303408;}
+#win-proj4 .pdf-link:hover{background:#787e20;}
+#win-proj4 .proj-divider{border-top-color:#9ca040;}
+
+/* Project 5 — Rich terracotta (wallpaper bot-right) */
+#win-proj5 .proj-title{color:#943820;border-bottom-color:#943820;}
+#win-proj5 .proj-tag{background:#943820;color:#faeee8;}
+#win-proj5 .proj-meta{background:#faeee8;border-top-color:#c87060;border-left-color:#c87060;border-right-color:#f0c8bc;border-bottom-color:#f0c8bc;}
+#win-proj5 .proj-meta strong{color:#943820;}
+#win-proj5 .proj-body strong{color:#943820;}
+#win-proj5 .stat-box{background:#f0c8bc;}
+#win-proj5 .stat-box strong{color:#943820;}
+#win-proj5 .pdf-link{background:#943820;border-top-color:#c86850;border-left-color:#c86850;border-right-color:#4a1c10;border-bottom-color:#4a1c10;}
+#win-proj5 .pdf-link:hover{background:#b04828;}
+#win-proj5 .proj-divider{border-top-color:#c87060;}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor — inline SVG so no white-box from image background -->
+<div id="custom-cursor">
+  <svg width="28" height="28" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2 2L2 19L6.5 15L9.5 21.5L12 20.5L9 14H16L2 2Z"
+          fill="white" stroke="black" stroke-width="1.3" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<!-- ═══════════════ TITLE SCREEN ═══════════════ -->
+<div id="title-screen">
+  <img src="./titlescreen.png" alt="Portfolio Title Screen">
+  <button class="enter-btn" onclick="enterSite()">enter</button>
+</div>
+
+<!-- ═══════════════ DESKTOP ═══════════════ -->
+<div id="desktop">
+  <div id="search-bar" style="display:none;position:fixed;top:27px;left:0;right:0;z-index:999;background:#1a1a1a;border-bottom:1px solid #444;padding:5px 12px;display:none;align-items:center;gap:8px;">
+    <span style="color:#888;font-family:'Courier New',monospace;font-size:11px;white-space:nowrap;">SEARCH:</span>
+    <input id="search-input" type="text" placeholder="type a keyword to filter uploads..."
+      oninput="filterFiles(this.value)"
+      onkeydown="if(event.key==='Escape')toggleSearch()"
+      style="flex:1;background:#333;border:1px solid #555;color:#fff;padding:4px 8px;
+             font-family:'Courier New',monospace;font-size:12px;outline:none;">
+    <span onclick="toggleSearch()" style="color:#aaa;cursor:pointer;font-size:16px;line-height:1;padding:0 4px;">&times;</span>
+  </div>
+  <div id="search-results" style="display:none;position:fixed;top:55px;left:0;right:0;max-height:300px;overflow-y:auto;background:#1a1a1a;border-bottom:1px solid #444;z-index:998;font-family:'Courier New',monospace;"></div>
+  <div id="menubar">
+    <div class="menu-left">
+      <!-- Apple logo -->
+      <svg width="14" height="17" viewBox="0 0 24 24" fill="white" style="flex-shrink:0;display:block;transform:rotate(180deg);">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.37 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+      </svg>
+      <span class="app-name">MV Studio</span>
+      <span onclick="toggleSearch()" style="font-weight:400;opacity:.9;cursor:pointer;user-select:none;" title="search uploads">Search</span>
+    </div>
+    <div class="menu-center">
+      <div class="googly-eye" id="eye-left"><div class="pupil" id="pupil-left"></div></div>
+      <div class="googly-eye" id="eye-right"><div class="pupil" id="pupil-right"></div></div>
+    </div>
+    <div class="menu-right">
+      <!-- LinkedIn inline SVG — no external file needed -->
+      <a href="https://www.linkedin.com/in/michelle-vasquez-179975324" target="_blank"
+         style="display:flex;align-items:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white" style="display:block;flex-shrink:0;">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+      </a>
+      <!-- Email — FIX 5: 16×16 SVG -->
+      <a href="mailto:michelle.vasquez.28@dartmouth.edu"
+         style="display:flex;align-items:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="white" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             class="menu-icon-svg">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <polyline points="2,4 12,13 22,4"/>
+        </svg>
+      </a>
+      <span id="clock">06.10.26</span>
+    </div>
+  </div>
+
+  <div id="desktop-bg"></div>
+
+  <!-- FIX 1: all icon imgs have transparent background, no mix-blend-mode -->
+  <div id="icons-container">
+    <div class="desktop-icon" style="top:4%;left:2%"
+         onclick="toggleWindow('win-music')">
+      <img src="./fav music icon.png" alt="">
+      <span class="icon-label">currently listening</span>
+    </div>
+    <div class="desktop-icon" style="top:2%;left:18%"
+         onclick="toggleWindow('win-proj1')">
+      <img src="./regfolder.png" alt=""
+           style="filter:hue-rotate(0deg) saturate(1.1);">
+      <span class="icon-label">Project 1 (Education Design)</span>
+    </div>
+    <div class="desktop-icon" style="top:30%;left:4%"
+         onclick="toggleWindow('win-tools')">
+      <img src="./toolsicon.png" alt="">
+      <span class="icon-label">tools</span>
+    </div>
+    <div class="desktop-icon" style="top:10%;left:53%"
+         onclick="toggleWindow('win-about')">
+      <img src="./aboutme.txt.png" alt="" style="width:78px;height:78px;">
+      <span class="icon-label">aboutme.txt</span>
+    </div>
+    <div class="desktop-icon" style="top:3%;right:10%"
+         onclick="toggleWindow('win-writing')">
+      <img src="./pencil.png" alt="">
+      <span class="icon-label">writing</span>
+    </div>
+    <div class="desktop-icon" style="top:14%;right:1%"
+         onclick="toggleWindow('win-reading')">
+      <img src="./bookicon.png" alt="">
+      <span class="icon-label">currently reading</span>
+    </div>
+    <div class="desktop-icon" style="top:65%;left:54%"
+         onclick="toggleWindow('win-pov')">
+      <img src="./pov.txt.png" alt="" style="width:78px;height:78px;">
+      <span class="icon-label">pov.txt</span>
+    </div>
+    <div class="desktop-icon" style="top:50%;right:1%"
+         onclick="toggleWindow('win-cv')">
+      <img src="./cv_2026.png" alt="" style="width:78px;height:78px;">
+      <span class="icon-label">cv_2026</span>
+    </div>
+    <div class="desktop-icon" style="top:40%;left:33%"
+         onclick="toggleWindow('win-proj2')">
+      <img src="./regfolder.png" alt=""
+           style="filter:hue-rotate(175deg) saturate(1.6);">
+      <span class="icon-label">Project 2 (Product Design)</span>
+    </div>
+    <div class="desktop-icon" style="top:37%;right:16%"
+         onclick="toggleWindow('win-proj5')">
+      <img src="./regfolder.png" alt=""
+           style="filter:hue-rotate(290deg) saturate(2.2) brightness(1.1);">
+      <span class="icon-label">Project 5 (Education Design)</span>
+    </div>
+    <div class="desktop-icon" style="top:55%;left:1%"
+         onclick="toggleWindow('win-proj3')">
+      <img src="./regfolder.png" alt=""
+           style="filter:hue-rotate(-15deg) brightness(1.25) saturate(0.8);">
+      <span class="icon-label">Project 3 (Web Design)</span>
+    </div>
+    <div class="desktop-icon" style="top:65%;left:22%"
+         onclick="toggleWindow('win-proj4')">
+      <img src="./regfolder.png" alt=""
+           style="filter:hue-rotate(60deg) saturate(1.4) brightness(1.05);">
+      <span class="icon-label">Project 4 (Product Design)</span>
+    </div>
+  </div>
+
+  <!-- Corner Character — FIX 6: circular crop via border-radius on .face-container -->
+  <div id="corner-character">
+    <div class="speech-bubble">Click any folder or<br>icon to view more!</div>
+    <div class="face-container">
+      <!-- Hidden video — me.mp4 is a copy without the ! in the filename -->
+      <video id="face-video" autoplay loop muted playsinline
+             style="display:none;position:absolute;">
+        <source src="./me.mp4" type="video/mp4">
+        <source src="./me!.mp4" type="video/mp4">
+      </video>
+      <!-- Canvas renders green-screen-removed video frames;
+           circular crop applied by parent border-radius:50% -->
+      <canvas id="face-canvas" style="width:100%;height:100%;display:block;"></canvas>
+    </div>
+  </div>
+
+  <!-- FIX 7 — Comment Icon: fixed bottom-left, always visible -->
+  <div id="comment-icon" onclick="openCommentBox()">
+    <span class="comment-tooltip">leave a comment?</span>
+    <!-- Pixel-art notepad icon -->
+    <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+      <!-- notepad body -->
+      <rect x="7" y="10" width="30" height="28" rx="2"
+            fill="#fffff0" stroke="#444" stroke-width="2"/>
+      <!-- spiral rings -->
+      <rect x="14" y="7" width="4" height="7" rx="2" fill="#888"/>
+      <rect x="20" y="7" width="4" height="7" rx="2" fill="#888"/>
+      <rect x="26" y="7" width="4" height="7" rx="2" fill="#888"/>
+      <!-- ruled lines -->
+      <line x1="12" y1="19" x2="32" y2="19" stroke="#bbb" stroke-width="1.5"/>
+      <line x1="12" y1="24" x2="32" y2="24" stroke="#bbb" stroke-width="1.5"/>
+      <line x1="12" y1="29" x2="32" y2="29" stroke="#bbb" stroke-width="1.5"/>
+      <line x1="12" y1="34" x2="26" y2="34" stroke="#bbb" stroke-width="1.5"/>
+      <!-- pencil (bottom-right corner decoration) -->
+      <g transform="rotate(-40 34 36)">
+        <rect x="31" y="28" width="5" height="11" rx="1" fill="#f5d020"/>
+        <polygon points="31,39 36,39 33.5,43" fill="#ffa500"/>
+        <line x1="31" y1="31" x2="36" y2="31" stroke="#c8a800" stroke-width="1"/>
+      </g>
+    </svg>
+  </div>
+</div><!-- end #desktop -->
+
+<!-- ═══════════════ FINDER WINDOWS ═══════════════ -->
+
+<!-- Currently Listening — exactly currentlyplaying.png, nothing else -->
+<div class="finder-window" id="win-music"
+     style="min-width:unset;min-height:unset;top:10%;left:18%;width:280px;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-music')">
+    <div class="tl tl-r" onclick="closeWindow('win-music')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-music')"></div>
+    <div class="tl tl-g" onclick="enlargeWindow('win-music')"></div>
+    <div class="finder-title">currently listening</div>
+  </div>
+  <div class="finder-content" style="padding:0;background:transparent;">
+    <img src="./currentlyplaying.png?v=1" alt="currently listening"
+         style="display:block;width:100%;height:auto;">
+  </div>
+</div>
+
+<!-- About Me -->
+<div class="finder-window" id="win-about" style="width:600px;top:8%;left:20%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-about')">
+    <div class="tl tl-r" onclick="closeWindow('win-about')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-about')"></div><div class="tl tl-g" onclick="enlargeWindow('win-about')"></div>
+    <div class="finder-title">aboutme.txt</div>
+  </div>
+  <div class="finder-content" style="padding:0;background:#cc2200;display:block;">
+    <div class="am-inner">
+      <div class="am-bar">
+        <div class="tl tl-r" style="width:10px;height:10px;"></div>
+        <div class="tl tl-y" style="width:10px;height:10px;"></div>
+        <div class="tl tl-g" style="width:10px;height:10px;"></div>
+      </div>
+      <div class="am-text">
+        <p>I am drawn to designing and reworking systems and services, especially in the educational field. Efforts to reform American education stretch back 150 years, with mixed results. This history makes it easy to assume that the system is broken beyond fixing, or that only top-down legislation can move it. I believe meaningful change comes from the people closest to students: educators, parents, administrators, and the designers who work alongside them. That last group is where I want to contribute.</p>
+        <p>My projects are based on the Human Centered Design principles and values, designing for real human needs rather than adapting humans to machines. The process I follow draws on IDEO's popular framework: empathize, define, ideate, prototype, and test. In practice, that means I spend more time than most in the first two phases. I've found that the quality of everything toward the latter end — the ideas, the prototypes, the final design — depends almost entirely on how well you've understood the problem and the people facing it before you try to solve it. I have worked with small groups of 3–4 other HCD students, as well as collaborated with local Upper Valley schools and organizations.</p>
+        <p>Outside of design, I spend a lot of time writing. This is mainly in the form of journaling about the things I thought and saw that day or writing short stories based on observations I've made throughout the day. That instinct to observe and sit with something before drawing conclusions has shaped how I design — I'm rarely the first person in the room to propose a solution, but I tend to ask the question nobody thought to write down.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tools -->
+<div class="finder-window" id="win-tools"
+     onmousedown="startDrag(event,'win-tools')"
+     style="width:520px;min-height:480px;top:8%;left:28%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-tools')">
+    <div class="tl tl-r" onclick="closeWindow('win-tools')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-tools')"></div><div class="tl tl-g" onclick="enlargeWindow('win-tools')"></div>
+    <div class="finder-title">tools</div>
+  </div>
+  <div class="finder-content">
+    <img src="./whentoolsclicked.png" alt="tools"
+         style="max-width:100%;max-height:420px;object-fit:contain;">
+  </div>
+</div>
+
+
+<!-- POV -->
+<div class="finder-window" id="win-pov" style="width:600px;top:8%;left:22%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-pov')">
+    <div class="tl tl-r" onclick="closeWindow('win-pov')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-pov')"></div>
+    <div class="tl tl-g" onclick="enlargeWindow('win-pov')"></div>
+    <div class="finder-title">pov.txt</div>
+  </div>
+  <div class="finder-content" id="pov-content-wrap" style="padding:0;position:relative;overflow:hidden;display:block;min-height:380px;">
+    <img src="./window.png" alt="Notepad frame" style="width:100%;display:block;">
+    <div style="position:absolute;top:16%;bottom:9%;left:5.5%;right:4%;
+                overflow-y:auto;padding:4px 6px;
+                font-family:'Courier New',monospace;font-size:11px;
+                line-height:1.6;color:#111;background:transparent;">
+      <p style="margin:0 0 12px;">In my midterm reflection I wrote that “good design is unfinished.” Looking back on the work we’ve done this term and the website I created, I believe it more than ever. However, what I meant then was that designs can always be improved, that nothing is truly finished. What I know now is different: unfinished isn’t a flaw in good design — it’s the point. A design with a longer life has more chances to be reshaped and given new meaning by the people who use it. At the midterm I was still thinking about completion, drowning in stress over completing the final deliverable and not looking at the future of my design.</p><p style="margin:0 0 12px;">This essentially sums up how I, and my approach to design, has changed over these past few weeks. For this final challenge I was forced to engage with things I had never done before. Yet, as I have seen throughout this class, my confidence in designing has grown considerably because of this. This course has pushed me to run through the design process, from ideation to creation, without giving me the time to second guess myself or stray from my first few original ideas. This has given me the confidence to run with the first idea that strikes my interest and aligns with my passions, and I think this has allowed me to create better projects overall. I don’t think this project, or I, am finished. Even now that the course is over, I can already see where Version 4 would begin. But, as I said before, I believe “good design is unfinished,” and DIPS has proven that to be true. This project is better for every “round of friction,” every difficulty, and every failed prompt.</p><p style="margin:0 0 12px;">I know now that I design best, and am most happy, when I am working with service or program design that looks at stakeholders holistically. I also know that I am a better designer for accepting unfamiliar ideas that have challenged my ways of thinking before this course and keeping those in my “designer’s toolkit,” because these seeds of feedback are what will shape the way I approach every project from now on.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CV -->
+<div class="finder-window" id="win-cv" style="width:600px;height:680px;top:8%;left:22%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-cv')">
+    <div class="tl tl-r" onclick="closeWindow('win-cv')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-cv')"></div>
+    <div class="tl tl-g" onclick="enlargeWindow('win-cv')"></div>
+    <div class="finder-title">cv_2026.pdf</div>
+  </div>
+  <div class="finder-content" style="padding:0;display:flex;flex-direction:column;align-items:stretch;overflow:hidden;">
+    <div style="background:#3c3c3c;padding:6px 10px;font-family:'Courier New',monospace;font-size:10px;color:#ccc;letter-spacing:0.5px;flex-shrink:0;">
+      Michelle Vasquez &mdash; cv_2026.pdf &nbsp;
+      <a href="./Michelle Vasquez- cv_2026 copy.docx.pdf" target="_blank"
+         style="color:#7ec8e3;font-family:'Courier New',monospace;font-size:10px;">&gt;&gt; open PDF</a>
+    </div>
+    <iframe src="./Michelle Vasquez- cv_2026 copy.docx.pdf"
+            style="flex:1;width:100%;border:none;background:#fff;"
+            title="CV 2026"></iframe>
+  </div>
+</div>
+<!-- Currently Reading — mac Preview: image fills window vertically -->
+<div class="finder-window" id="win-reading" style="width:420px;height:660px;top:8%;left:22%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-reading')">
+    <div class="tl tl-r" onclick="closeWindow('win-reading')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-reading')"></div><div class="tl tl-g" onclick="enlargeWindow('win-reading')"></div>
+    <div class="finder-title">currently reading</div>
+  </div>
+  <div class="finder-content" style="flex:1;">
+    <img src="./currentlyreading_icon.png" alt="currently reading">
+  </div>
+</div>
+
+<!-- Writing -->
+<div class="finder-window" id="win-writing" style="width:580px;top:10%;left:20%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-writing')">
+    <div class="tl tl-r" onclick="closeWindow('win-writing')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-writing')"></div><div class="tl tl-g" onclick="enlargeWindow('win-writing')"></div>
+    <div class="finder-title">writing</div>
+  </div>
+  <div class="finder-body">
+    <div class="finder-sidebar">
+      <div class="sb-header">Favorites</div>
+      <div class="sb-item active">[DIR] Writing</div>
+      <div class="sb-header">Locations</div>
+      <div class="sb-item">[HDD] My Portfolio</div>
+    </div>
+    <div class="finder-content" style="padding:0;">
+      <div style="background:#000080;color:#fff;font-family:'Courier New',monospace;font-size:10px;padding:3px 8px;font-weight:700;letter-spacing:1px;">C:\PORTFOLIO\WRITING\*.*</div>
+      <ul class="writing-list">
+        <li><a class="writing-item"
+               href="./SINGERS FYS-- Paper %231 (Draft).docx" target="_blank">
+          <span class="file-ico">[DOC]</span>
+          <span class="file-name">SINGERS_FYS_PAPER1_DRAFT</span>
+          <span class="file-type">.DOCX</span>
+        </a></li>
+        <li><a class="writing-item"
+               href="./MV-- Stories from the Meth Capital_ Ethnographic Sensibility in Jason Pine%E2%80%99s The Alchemy of Meth.pdf"
+               target="_blank">
+          <span class="file-ico">[PDF]</span>
+          <span class="file-name">STORIES_FROM_THE_METH_CAPITAL</span>
+          <span class="file-type">.PDF</span>
+        </a></li>
+        <li><a class="writing-item"
+               href="./CRTW -- Story 1 (1) copy.pdf" target="_blank">
+          <span class="file-ico">[PDF]</span>
+          <span class="file-name">CRTW_STORY_1</span>
+          <span class="file-type">.PDF</span>
+        </a></li>
+        <li><a class="writing-item"
+               href="./Michelle Vasquez- ZINE ENTRY.pdf" target="_blank">
+          <span class="file-ico">[PDF]</span>
+          <span class="file-name">MV_ZINE_ENTRY</span>
+          <span class="file-type">.PDF</span>
+        </a></li>
+        <li><a class="writing-item"
+               href="./MV -- FILM 47.28 FInal Project copy.pdf" target="_blank">
+          <span class="file-ico">[PDF]</span>
+          <span class="file-name">FILM_47_28_FINAL_PROJECT</span>
+          <span class="file-type">.PDF</span>
+        </a></li>
+      </ul>
+      <div class="writing-status" style="background:#c0c0c0;border-top:2px solid #808080;font-family:'Courier New',monospace;font-size:10px;padding:3px 8px;color:#000;">5 object(s) &nbsp;|&nbsp; Click to open file</div>
+    </div>
+  </div>
+</div>
+
+<!-- Project 1 — BLINKY / AI TA for Canvas -->
+<div class="finder-window" id="win-proj1" style="width:860px;height:700px;top:6%;left:8%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-proj1')">
+    <div class="tl tl-r" onclick="closeWindow('win-proj1')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-proj1')"></div><div class="tl tl-g" onclick="enlargeWindow('win-proj1')"></div>
+    <div class="finder-title">Project 1 — Education Design</div>
+  </div>
+  <div class="finder-body">
+    <div class="finder-sidebar">
+      <div class="sb-header">Projects</div>
+      <div class="sb-item active">📁 Project 1</div>
+      <div class="sb-header">Locations</div>
+      <div class="sb-item">💻 My Portfolio</div>
+    </div>
+    <div class="finder-content">
+      <div class="proj-title">BLINKY -- Canvas A.I. Teaching Assistant</div>
+      <div class="proj-sub">Dartmouth ENGS 15.11 :: Education Design</div>
+      <span class="proj-tag">[ EDUCATION DESIGN ]</span>
+      <div class="concept-tags"><span class="ctag">Artificial (AI)</span><span class="ctag">Interaction/Sensory</span><span class="ctag">Service</span><span class="ctag">Technology as Teammate</span></div>
+      <div class="proj-meta">
+        <div><strong>TEAM:</strong> Michelle Vasquez, Oscar, Paola</div>
+        <div><strong>ROLE:</strong> Co-Designer</div>
+        <div><strong>TOOLS:</strong> Canva, Google Slides</div>
+      </div>
+      <hr class="proj-divider">
+      <div class="proj-body">
+        <p><strong>CHALLENGE:</strong> Propose an innovation that allows Dartmouth professors and staff to better integrate computer tools into their curricula without replacing student effort or critical thinking.</p>
+        <p><strong>SOLUTION:</strong> BLINKY -- an A.I. Teaching Assistant embedded in Canvas that supports professors with grading, feedback, and course management while keeping students at the center of the learning process.</p>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><strong>43</strong><span>students surveyed</span></div>
+        <div class="stat-box"><strong>36</strong><span>interviews conducted</span></div>
+        <div class="stat-box"><strong>95%</strong><span>used A.I. for coursework</span></div>
+        <div class="stat-box"><strong>3</strong><span>professors interviewed</span></div>
+      </div>
+      <a class="pdf-link" href="./AI TA for Canvas.pdf" target="_blank">&gt;&gt; view full PDF</a>
+    </div>
+  </div>
+</div>
+
+<!-- Project 2 — Blaggy Bag -->
+<div class="finder-window" id="win-proj2" style="width:860px;height:700px;top:6%;left:8%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-proj2')">
+    <div class="tl tl-r" onclick="closeWindow('win-proj2')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-proj2')"></div><div class="tl tl-g" onclick="enlargeWindow('win-proj2')"></div>
+    <div class="finder-title">Project 2 — Product Design</div>
+  </div>
+  <div class="finder-body">
+    <div class="finder-sidebar">
+      <div class="sb-header">Projects</div>
+      <div class="sb-item active">📁 Project 2</div>
+      <div class="sb-header">Locations</div>
+      <div class="sb-item">💻 My Portfolio</div>
+    </div>
+    <div class="finder-content">
+      <div class="proj-title">The Blaggy -- Innovative Bag Design</div>
+      <div class="proj-sub">Product Design :: team .kom :: Spring 2025</div>
+      <span class="proj-tag">[ PRODUCT DESIGN ]</span>
+      <div class="concept-tags"><span class="ctag">Material</span><span class="ctag">Experience Economy</span><span class="ctag">Craftsmanship</span><span class="ctag">Emotionally Durable Design</span></div>
+      <div class="proj-meta">
+        <div><strong>TEAM:</strong> team .kom</div>
+        <div><strong>ROLE:</strong> Co-Designer</div>
+        <div><strong>SEASON:</strong> Spring 2025</div>
+      </div>
+      <hr class="proj-divider">
+      <div class="proj-body">
+        <p><strong>CONCEPT:</strong> A spring-inspired bag designed around a defined target audience, balancing functionality with seasonal aesthetic sensibility and expressive material choices.</p>
+        <p><strong>PROCESS:</strong> Target audience research --&gt; concept sketches --&gt; material exploration --&gt; prototype construction --&gt; final presentation.</p>
+      </div>
+      <a class="pdf-link" href="./Innovative Bag Design.pdf" target="_blank">&gt;&gt; view full PDF</a>
+    </div>
+  </div>
+</div>
+
+<!-- Project 3 — DIPS -->
+<div class="finder-window" id="win-proj3" style="width:860px;height:700px;top:6%;left:8%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-proj3')">
+    <div class="tl tl-r" onclick="closeWindow('win-proj3')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-proj3')"></div><div class="tl tl-g" onclick="enlargeWindow('win-proj3')"></div>
+    <div class="finder-title">Project 3 — Web Design</div>
+  </div>
+  <div class="finder-body">
+    <div class="finder-sidebar">
+      <div class="sb-header">Projects</div>
+      <div class="sb-item active">📁 Project 3</div>
+      <div class="sb-header">Locations</div>
+      <div class="sb-item">💻 My Portfolio</div>
+    </div>
+    <div class="finder-content">
+      <div class="proj-title">D.I.P.S. -- Dartmouth Innovative Project Studio</div>
+      <div class="proj-sub">Web Design :: Case Study #03 :: May--June 2026</div>
+      <span class="proj-tag">[ WEB DESIGN ]</span>
+      <div class="concept-tags"><span class="ctag">Technology as Teammate</span><span class="ctag">Useful Friction</span><span class="ctag">Candor Without Authority</span><span class="ctag">Curation as Self-Knowledge</span><span class="ctag">Body of Work</span><span class="ctag">Invisible Systems Made Visible</span><span class="ctag">Service Design Under Pressure</span><span class="ctag">Ugly Darlings</span><span class="ctag">Iteration at Scale</span><span class="ctag">Reflection-in-Action</span><span class="ctag">Audience as Hero</span></div>
+      <div class="proj-meta">
+        <div><strong>ROLE:</strong> Lead Designer (independent)</div>
+        <div><strong>TIMELINE:</strong> May -- June 2026 (3 weeks)</div>
+        <div><strong>TOOLS:</strong> Claude Code, Canva</div>
+        <div><strong>LIVE SITE:</strong>
+          <a href="https://dartmouthinnovativeprojectstudio.netlify.app/"
+             target="_blank" style="color:#2e6070;font-family:'Courier New',monospace;font-size:10px;">
+            dartmouthinnovativeprojectstudio.netlify.app</a>
+        </div>
+      </div>
+      <hr class="proj-divider">
+      <div class="proj-body">
+        <p><strong>ONE-SENTENCE OUTCOME:</strong> A functioning, Claude Code-built web app where Dartmouth students can display, share, and discover project work regardless of discipline or polish level -- an idea born from a forgotten folder on a desktop that became a real, shareable platform.</p>
+      </div>
+      <div class="proj-case-section">
+        <h4>1. Context</h4>
+        <p>The Dartmouth Innovative Project Studio was the final project for ENGS 15.15 (Design Survivor). The idea came from looking at a folder on a desktop full of projects from this class and others that had simply been forgotten. At Dartmouth, a common belief among students is that portfolios and independent projects only exist to serve future professional purposes -- job applications, graduate school, networking. That culture means creative work goes undocumented if it is not impressive or professional enough, and students outside of STEM, Art, or Business fields often regard their project work as less valuable.</p>
+        <h4>2. Problem</h4>
+        <p>Students spend days, sometimes weeks, working on projects that had nowhere to live after the course ended. The feedback on this work is often external -- from professors or hiring committees -- which makes the work feel disposable. Independent projects and class assignments are constantly devalued. The core belief behind DIPS: exhibiting work changes how students value it in the first place. The goal was to create a space where every project has a purpose, is seen, and can live for future students to reference and draw inspiration from.</p>
+        <h4>3. Research</h4>
+        <p>Research began with a short round of interviews with Dartmouth students, conducted during Version 1 and revisited while building Version 3 for final user testing. Interviews explored what features would make the site useful and what would help users engage effectively. A persona of a target user -- their goals and challenges when it comes to displaying project work -- guided the feature prioritization throughout the build.</p>
+        <h4>4. Process</h4>
+        <p>The project progressed from paper and pencil sketches to Canva drafts to a vibecoded web app using Claude Code. The first Canva draft was too busy and pastel, with no room for navigation or a search feature and no directions for how to use the site. Version 2 fixed the visual problem but introduced a new one: prompts to Claude were too vague, so Claude began creating its own iteration of the design -- generating its own art and using colors and fonts that simply weren't wanted.</p>
+        <p>Dead end: Trying to solve design and function at the same time. The fix was to set the overall design difficulties aside and work on interactive features first -- sidebar, navigation, upload procedure -- then return to the aesthetic of the final site. Separating these two workstreams made both more achievable.</p>
+        <h4>5. Key Decisions</h4>
+        <p><strong>Dialing back the design rather than adding to it.</strong> The original Canva design was full of color and patterns. It had personality but I couldn't imagine students actually using it as part of the Dartmouth experience. The decision to strip many of these elements and switch to Dartmouth's green was not just aesthetic -- it immediately communicated who the site was built for.</p>
+        <p><strong>Letting the design take a backseat while building interactive features.</strong> When Claude kept going in its own visual direction, the instinct was to keep fighting it on aesthetics. User tests confirmed what actually mattered: the ability to write in filters so users could get specific with what they were looking for, and a message system so the site could facilitate real collaboration, not just browsing. Getting function right first made finishing the design feel achievable rather than like starting over.</p>
+        <h4>6. Outcome &amp; Reflection</h4>
+        <p><strong>What changed:</strong> A functioning Claude Code-built web app reached V3 and was presented at Technigala 2026. While this site is not yet ready for all users, an idea born from a forgotten folder on a desktop became a real, shareable platform that other Dartmouth students could eventually engage with.</p>
+        <p><strong>What you learned:</strong> "Good design is unfinished." I started this course thinking good design required time, experience, exhaustive research, and certainty. I leave it knowing that what it more importantly requires is a willingness to start, a discipline to listen and iterate, and the humility to let things that aren't working go.</p>
+      </div>
+      <a class="pdf-link" href="./DIPS.pdf" target="_blank">&gt;&gt; view full PDF</a>
+    </div>
+  </div>
+</div>
+
+<!-- Project 4 — Modular Sneaker -->
+<div class="finder-window" id="win-proj4" style="width:860px;height:700px;top:6%;left:8%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-proj4')">
+    <div class="tl tl-r" onclick="closeWindow('win-proj4')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-proj4')"></div><div class="tl tl-g" onclick="enlargeWindow('win-proj4')"></div>
+    <div class="finder-title">Project 4 — Product Design</div>
+  </div>
+  <div class="finder-body">
+    <div class="finder-sidebar">
+      <div class="sb-header">Projects</div>
+      <div class="sb-item active">📁 Project 4</div>
+      <div class="sb-header">Locations</div>
+      <div class="sb-item">💻 My Portfolio</div>
+    </div>
+    <div class="finder-content">
+      <div class="proj-title">Modular Sneaker -- The 30-Year Redesign Challenge</div>
+      <div class="proj-sub">Product Design :: Case Study #02 :: April 2026</div>
+      <span class="proj-tag">[ PRODUCT DESIGN ]</span>
+      <div class="concept-tags"><span class="ctag">Emotionally Durable Design</span><span class="ctag">Repair as Understanding</span><span class="ctag">Longevity (L)</span><span class="ctag">Service (S)</span><span class="ctag">Craftsmanship</span><span class="ctag">Constraint as Identity</span></div>
+      <div class="proj-meta">
+        <div><strong>ROLE:</strong> Co-Designer; Co-Presenter; Main Service Designer</div>
+        <div><strong>TEAM:</strong> 2 HCD students, Design Survivor course (ENGS 15.15)</div>
+        <div><strong>TIMELINE:</strong> April 2026 (1 week)</div>
+        <div><strong>TOOLS:</strong> Gemini, Fuser, Google Slides</div>
+      </div>
+      <hr class="proj-divider">
+      <div class="proj-body">
+        <p><strong>ONE-SENTENCE OUTCOME:</strong> Redesigned the sneaker as a modular, part-swappable product so consumers may only replace what wears out or falls out of style -- addressing the core insight that people tend to discard shoes not because the whole shoe fails, but because one part does.</p>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><strong>2.68B</strong><span>pairs discarded/yr</span></div>
+        <div class="stat-box"><strong>12-18mo</strong><span>avg sneaker lifespan</span></div>
+      </div>
+      <div class="proj-case-section">
+        <h4>1. Context</h4>
+        <p>This project was a design challenge in ENGS 15.15 (Design Survivor), built around the question: what would it take to design a product someone could own and use for 30 years? My partner and I chose to focus on the sneaker industry because, even though shoes are considered a necessity, 2.68 billion pairs are purchased annually in the United States alone, most lasting only 12--18 months before being discarded. The expense and sustainability concerns were what provoked this design direction.</p>
+        <h4>2. Problem</h4>
+        <p>People are not discarding sneakers because the whole shoe fails. They are getting rid of them because one part wears out, or the shoe falls out of style, or no longer fits their personal needs. The average sneaker offers no way to fix just one component. The current shopping experience presents a single choice: pick a shoe and live with it until it fails.</p>
+        <h4>3. Research</h4>
+        <p>My partner and I conducted individual interviews with people who had owned objects for 30 or more years, looking for patterns across cases. Three themes emerged:</p>
+        <p><strong>Emotional attachment</strong> -- connections between people and objects tied to identity and memory. <strong>Durability</strong> -- items that still function feel wasteful to discard. <strong>Future utility</strong> -- people delay disposing of products they believe they will need again.</p>
+        <h4>4. Process</h4>
+        <p>Working from three research patterns, our team focused on how the sneaker redesign could best create user agency over the object continuously over time. Drawing on Chapman's <em>Emotionally Durable Design</em>, Sennett's theory of repair as understanding, and Patagonia's durability-as-desirability model, the modular sneaker puts the consumer in the role of craftsman from the start: building their shoe, replacing parts when needed, and trading pieces in for store credit when done.</p>
+        <p>Dead end: We initially considered a change of experience by designing a simple repair service for broken or worn shoes. We scrapped this because it addresses the problem after it occurs -- the goal was to prevent the disposal impulse entirely from the start.</p>
+        <h4>5. Key Decisions</h4>
+        <p><strong>Mail-in or in-store trade system:</strong> Rather than just selling replacement parts, our design includes a system where used components can be recycled in exchange for store credit. This addressed sustainability directly and created a business incentive for durability over disposal.</p>
+        <p><strong>Workshop-style retail experience:</strong> The redesigned store replaces the cold, warehouse format with a space where customers build their shoe from parts that suit their style and needs. The existing store format -- walls of near-identical choices -- actively discourages the relationship-building with an object that makes long-term ownership possible. Designing the experience of acquiring the shoe was as important as designing the shoe itself.</p>
+        <h4>6. Outcome &amp; Reflection</h4>
+        <p><strong>What changed:</strong> While no prototype was built or tested, this concept design reframes the sneaker's entire lifecycle -- from an easily disposable trend-driven product to an evolving, owner-managed object.</p>
+        <p><strong>What you learned:</strong> The value of real people's stories. Before arriving at a design focus, my partner and I heard actual accounts of why people chose to own things for long periods of time. This made every design decision feel grounded and directly informed the feeling we wanted to create with the final product.</p>
+      </div>
+      <a class="pdf-link" href="./Modular Sneaker.pdf" target="_blank">&gt;&gt; view full PDF</a>
+    </div>
+  </div>
+</div>
+
+<!-- Project 5 — ELL Onboarding -->
+<div class="finder-window" id="win-proj5" style="width:860px;height:700px;top:6%;left:8%;">
+  <div class="finder-titlebar" onmousedown="startDrag(event,'win-proj5')">
+    <div class="tl tl-r" onclick="closeWindow('win-proj5')"></div>
+    <div class="tl tl-y" onclick="restoreWindow('win-proj5')"></div><div class="tl tl-g" onclick="enlargeWindow('win-proj5')"></div>
+    <div class="finder-title">Project 5 — Education Design</div>
+  </div>
+  <div class="finder-body">
+    <div class="finder-sidebar">
+      <div class="sb-header">Projects</div>
+      <div class="sb-item active">📁 Project 5</div>
+      <div class="sb-header">Locations</div>
+      <div class="sb-item">💻 My Portfolio</div>
+    </div>
+    <div class="finder-content">
+      <div class="proj-title">Belonging from the Start -- Multilingual Students in the Hartford School District</div>
+      <div class="proj-sub">Education Design :: Case Study #01 :: Oct--Nov 2025</div>
+      <span class="proj-tag">[ EDUCATION DESIGN ]</span>
+      <div class="concept-tags"><span class="ctag">Invisible Systems Made Visible</span><span class="ctag">Interviewing Users</span><span class="ctag">Dual Desires</span><span class="ctag">Experience Economy</span><span class="ctag">Emotional Design</span><span class="ctag">Service (S)</span></div>
+      <div class="proj-meta">
+        <div><strong>ROLE:</strong> Project Manager; Co-Designer</div>
+        <div><strong>TEAM:</strong> Project Manager + 5 students (including PM) + 3 Hartford School District partners</div>
+        <div><strong>TIMELINE:</strong> Oct--Nov 2025</div>
+        <div><strong>TOOLS:</strong> Miro, Canva, Google Slides</div>
+      </div>
+      <hr class="proj-divider">
+      <div class="proj-body">
+        <p><strong>ONE-SENTENCE OUTCOME:</strong> Created a foundation of research, observations, and interview data for a team of HCD students, Hartford School District partners, and Professor Rafe Steinhauer to continue reshaping the onboarding process for English Language Learners in the district.</p>
+      </div>
+      <div class="proj-case-section">
+        <h4>1. Context</h4>
+        <p>This was a collaborative project that brought together Rafe Steinhauer's Design &amp; Education course with Upper Valley School Districts. Teams were paired with the Hartford School District, which had already assembled a group of Equity Coordinators and Administrators to tackle issues of belonging and access in the district's middle and high schools.</p>
+        <h4>2. Problem</h4>
+        <p>Our challenge was to understand the ELL (English Language Learner) student experience and develop a plan for providing students an immediate sense of belonging in their first few months in the Hartford School District. A student who had recently relocated from another country described Hartford High School as isolating -- there was no space to speak their native language, and the requirement to communicate exclusively in English throughout the school day was exhausting.</p>
+        <h4>3. Research</h4>
+        <p>My team conducted 11 student interviews (across middle and high school) and 11 stakeholder interviews (principals, social workers, teachers, and ELL educators). We led two co-creation sessions with stakeholders using gallery walks and affinity mapping, and created a flowchart tracing an ELL student's journey from enrollment through graduation.</p>
+        <p>The central insight was that belonging for ELL students is less about language mastery and more about connection. Through sports, peer relationships, and cultural expression, students found belonging that extended beyond academics. Students described feeling exhausted by constant English immersion and disconnected from their culture, while educators felt underprepared and defaulted to deferring all ELL responsibility to the district's only two ML (Multi-Lingual) teachers.</p>
+        <h4>4. Process</h4>
+        <p>The project centered on data collection, organizing themes through affinity mapping and flowchart exercises. From these, our team identified orientation as a key intervention point -- shaping the three napkin pitches we created for continued building by a new HSD team.</p>
+        <p>Dead end: Initial exploration of digital translation tools and apps like Talking Points and Parent Square showed that technology was not the barrier to belonging. This shifted our focus toward human-centered interventions -- mentorship programs and community-building events -- that addressed the root cause directly.</p>
+        <h4>5. Key Decisions</h4>
+        <p><strong>Centering on extracurriculars and cultural expression</strong> rather than academic supports. Initially, as we learned that ELL students typically score lower than English-speaking peers, we explored ways to build belonging in the classroom. As interviews expanded, we saw how extracurricular activities bridge the connection between ELL students and their school communities upon arrival.</p>
+        <p><strong>Persona mapping before napkin pitches.</strong> We mapped school engagement against access to a first-language community outside of school. Students in the lower-left quadrant -- those with low extracurricular engagement and low native-language community access -- face the most isolation. One Hartford High student described the exhaustion of full-time English immersion and the distance from her culture after being unable to speak her native language to anyone outside the home. Designing from the hardest cases shaped ideas with meaningful impact for all incoming ELL students.</p>
+        <h4>6. Outcome &amp; Reflection</h4>
+        <p><strong>What changed:</strong> The project produced three beginning stages of program design: a sports tryout program, a Multicultural Night event, and a peer mentorship program partnered with Dartmouth College. The most significant deliverable was the collection of data from ELL students, administrators, district members, educators, and both ML teachers -- the foundation of knowledge that HSD partners and the continuing student team will build from.</p>
+        <p><strong>What you learned:</strong> The hardest design constraint wasn't generating ideas; it was resisting the impulse to address administrative or language-barrier issues (which are real but outside of scope) and focusing on the belonging that the most isolated students faced. In future iterations, building a pilot for even one program idea before the project ended could have left the new team with user-tested data to build from as they continued the work.</p>
+      </div>
+      <a class="pdf-link" href="./ELL Onboarding Protocol Reform.pdf" target="_blank">&gt;&gt; view full PDF</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     FIX 7 — COMMENT OVERLAY: Windows Notepad + AIM window
+     Opens when comment icon is clicked; draggable as a unit
+     ══════════════════════════════════════════════════════════════ -->
+<div id="comment-overlay">
+  <div id="win-notepad">
+    <div class="win98-titlebar" onmousedown="startDragOverlay(event)">
+      <div class="win98-titlebar-left">
+        <svg width="14" height="14" viewBox="0 0 44 44" style="flex-shrink:0;">
+          <rect x="7" y="10" width="30" height="28" rx="1" fill="#fffff0" stroke="#999" stroke-width="2"/>
+          <rect x="14" y="7" width="4" height="7" rx="1" fill="#ccc"/>
+          <rect x="20" y="7" width="4" height="7" rx="1" fill="#ccc"/>
+          <rect x="26" y="7" width="4" height="7" rx="1" fill="#ccc"/>
+        </svg>
+        <span>leave a note!</span>
+      </div>
+      <div class="win98-ctrls">
+        <div class="win98-btn" onclick="shrinkCommentBox()">_</div>
+        <div class="win98-btn" onclick="expandCommentBox()">□</div>
+        <div class="win98-btn" onclick="closeCommentBox()">✕</div>
+      </div>
+    </div>
+    <div class="win98-menubar">
+      <span class="win98-mitem">File</span>
+      <span class="win98-mitem">Edit</span>
+    </div>
+    <!-- posted comments display -->
+    <div class="comment-list" id="comment-list">
+      <span class="comment-empty">no notes yet — be the first!</span>
+    </div>
+    <input class="np-name-input" id="comment-name"
+           placeholder="your name / handle (required)" maxlength="40">
+    <textarea class="np-textarea" id="comment-input"
+              placeholder="type a note for michelle..."
+              style="height:90px;"></textarea>
+    <div class="np-statusbar">
+      <a href="mailto:michelle.vasquez.28@dartmouth.edu"
+         style="font-family:'Courier New',monospace;font-size:10px;color:#555;text-decoration:none;">
+        📧 email instead
+      </a>
+      <button class="np-send-btn" onclick="postComment()">post note</button>
+    </div>
+  </div>
+</div><!-- end #comment-overlay -->
+
+<script>
+// ── CUSTOM CURSOR ──
+// FIX 2: use transform:translate so top-left of cursor div = mouse position
+const cursor = document.getElementById('custom-cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+  updateEyes(e.clientX, e.clientY);
+});
+
+// ── GOOGLY EYES ──
+function updateEyes(mx, my) {
+  ['left','right'].forEach(side => {
+    const eye   = document.getElementById('eye-' + side);
+    const pupil = document.getElementById('pupil-' + side);
+    if (!eye) return;
+    const r  = eye.getBoundingClientRect();
+    const ex = r.left + r.width  / 2;
+    const ey = r.top  + r.height / 2;
+    const ang  = Math.atan2(my - ey, mx - ex);
+    const dist = Math.min(5, Math.hypot(mx - ex, my - ey) * 0.3);
+    pupil.style.transform =
+      `translate(calc(-50% + ${Math.cos(ang)*dist}px),` +
+               `calc(-50% + ${Math.sin(ang)*dist}px))`;
+  });
+}
+
+// ── LIVE CLOCK ──
+function updateClock() {
+  const d  = new Date();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  const yy = String(d.getFullYear()).slice(-2);
+  document.getElementById('clock').textContent = `${mm}.${dd}.${yy}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ── ENTER SITE ──
+// ── SEARCH ──
+function toggleSearch() {
+  const bar = document.getElementById('search-bar');
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+  const isOpen = bar.style.display === 'flex';
+  if (isOpen) {
+    bar.style.display = 'none';
+    if (results) results.style.display = 'none';
+  } else {
+    bar.style.display = 'flex';
+    input.value = '';
+    input.focus();
+  }
+}
+function filterFiles(query) {
+  const q = query.toLowerCase().trim();
+  const resultsEl = document.getElementById('search-results');
+  if (!resultsEl) return;
+
+  if (!q) { resultsEl.style.display = 'none'; return; }
+
+  const sources = [
+    { id:'win-proj1', cat:'Project', label:'BLINKY -- Canvas A.I. Teaching Assistant', terms:'blinky canvas ai education dartmouth engs 15 grading feedback assignment' },
+    { id:'win-proj2', cat:'Project', label:'The Blaggy -- Innovative Bag Design', terms:'bag blaggy product design spring material craftsmanship fashion' },
+    { id:'win-proj3', cat:'Project', label:'D.I.P.S. -- Dartmouth Innovative Project Studio', terms:'dips dartmouth project studio web design claude platform upload showcase' },
+    { id:'win-proj4', cat:'Project', label:'Modular Sneaker -- The 30-Year Object', terms:'modular sneaker 30 year longevity repair durable product design shoe' },
+    { id:'win-proj5', cat:'Project', label:'Belonging from the Start -- Multilingual Students', terms:'ell multilingual belonging education hartford bilingual language onboarding service' },
+    { id:'win-writing', cat:'Writing', label:'SINGERS FYS -- Paper #1 (Draft)', terms:'singers fys paper draft writing first year seminar' },
+    { id:'win-writing', cat:'Writing', label:'Stories from the Meth Capital -- Ethnographic Essay', terms:'meth capital ethnographic sensibility jason pine alchemy essay' },
+    { id:'win-writing', cat:'Writing', label:'CRTW -- Story 1', terms:'crtw creative writing story fiction' },
+    { id:'win-writing', cat:'Writing', label:'Michelle Vasquez -- Zine Entry', terms:'zine entry magazine art publication' },
+    { id:'win-writing', cat:'Writing', label:'FILM 47.28 -- Final Project', terms:'film cinema final project analysis' },
+    { id:'win-reading', cat:'Currently', label:'Currently Reading -- We Are Liars', terms:'reading book library lockhart liars fiction novel' },
+    { id:'win-music', cat:'Currently', label:'Currently Listening', terms:'music listening playlist songs audio' },
+    { id:'win-pov', cat:'About', label:'POV -- Point of View Statement', terms:'pov point of view perspective michelle statement values design' },
+    { id:'win-cv', cat:'About', label:'CV / Resume 2026', terms:'cv resume curriculum vitae experience education skills 2026' },
+    { id:'win-about', cat:'About', label:'About Me -- Michelle Vasquez', terms:'about bio michelle vasquez dartmouth designer anthropology hcd writer' },
+    { id:'win-tools', cat:'Tools', label:'Tools & Software', terms:'tools canva claude github excel word powerpoint figma slides google docs' },
+  ];
+
+  const matches = sources.filter(s =>
+    s.label.toLowerCase().includes(q) || s.terms.includes(q)
+  );
+
+  if (matches.length === 0) {
+    resultsEl.innerHTML = '<div class="sr-none">no results for "' + query.toUpperCase() + '"</div>';
+  } else {
+    resultsEl.innerHTML = matches.map(m =>
+      `<div class="sr-item" onclick="toggleWindow('${m.id}');toggleSearch();">
+        <span style="color:#888;font-size:10px;margin-right:8px;">[${m.cat}]</span>${m.label}
+      </div>`
+    ).join('');
+  }
+  resultsEl.style.display = 'block';
+}
+
+function enterSite() {
+  const ts = document.getElementById('title-screen');
+  ts.classList.add('fade-out');
+  setTimeout(() => {
+    ts.style.display = 'none';
+    document.getElementById('desktop').classList.add('visible');
+    renderComments();
+  }, 700);
+}
+
+// ── WINDOW MANAGEMENT (Finder windows) ──
+let topZ = 200;
+function toggleWindow(id) {
+  const win = document.getElementById(id);
+  if (!win) return;
+  if (win.classList.contains('open')) { win.classList.remove('open'); }
+  else { openWindow(id); }
+}
+function openWindow(id) {
+  const win = document.getElementById(id);
+  if (!win) return;
+  // If already open, just bring to front
+  if (win.classList.contains('open')) {
+    topZ++; win.style.zIndex = topZ; return;
+  }
+  // Max 3 open at a time — close all open windows before opening a 4th
+  const openWins = document.querySelectorAll('.finder-window.open');
+  if (openWins.length >= 3) {
+    openWins.forEach(w => w.classList.remove('open'));
+  }
+  topZ++;
+  win.style.zIndex = topZ;
+  win.classList.add('open');
+}
+function closeWindow(id) {
+  const win = document.getElementById(id);
+  if (win) win.classList.remove('open');
+}
+document.addEventListener('mousedown', e => {
+  const win = e.target.closest('.finder-window');
+  if (win && !e.target.classList.contains('tl-r')) {
+    topZ++; win.style.zIndex = topZ;
+  }
+});
+
+// ── DRAGGING (Finder windows) ──
+let dragging = null, dragOffX = 0, dragOffY = 0;
+function startDrag(e, id) {
+  if (e.target.classList.contains('tl')) return;
+  const win = document.getElementById(id);
+  dragging = win;
+  const r  = win.getBoundingClientRect();
+  dragOffX = e.clientX - r.left;
+  dragOffY = e.clientY - r.top;
+  topZ++; win.style.zIndex = topZ;
+  e.preventDefault();
+}
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  dragging.style.left   = (e.clientX - dragOffX) + 'px';
+  dragging.style.top    = (e.clientY - dragOffY) + 'px';
+  dragging.style.right  = 'auto';
+  dragging.style.bottom = 'auto';
+});
+document.addEventListener('mouseup', () => { dragging = null; });
+
+// ── COMMENT OVERLAY (FIX 7) ──
+function openCommentBox() {
+  document.getElementById('comment-overlay').classList.add('open');
+  renderComments();
+}
+function closeCommentBox() {
+  document.getElementById('comment-overlay').classList.remove('open');
+}
+function expandCommentBox() {
+  const win     = document.getElementById('win-notepad');
+  const list    = document.getElementById('comment-list');
+  const ta      = document.getElementById('comment-input');
+  const overlay = document.getElementById('comment-overlay');
+  if (win.dataset.size === 'expanded') {
+    win.style.width        = '430px';
+    list.style.height      = '120px';
+    ta.style.height        = '90px';
+    overlay.style.top      = '12%';
+    overlay.style.left     = '50%';
+    overlay.style.transform= 'translateX(-50%)';
+    win.dataset.size       = 'normal';
+  } else {
+    win.style.width        = '720px';
+    list.style.height      = '360px';
+    ta.style.height        = '200px';
+    overlay.style.top      = '50%';
+    overlay.style.left     = '50%';
+    overlay.style.transform= 'translate(-50%, -50%)';
+    win.dataset.size       = 'expanded';
+  }
+}
+function shrinkCommentBox() {
+  const win  = document.getElementById('win-notepad');
+  const list = document.getElementById('comment-list');
+  const ta   = document.getElementById('comment-input');
+  if (win.dataset.size === 'small') {
+    win.style.width   = '430px';
+    list.style.height = '120px';
+    ta.style.height   = '90px';
+    win.dataset.size  = 'normal';
+  } else {
+    win.style.width   = '300px';
+    list.style.height = '70px';
+    ta.style.height   = '50px';
+    win.dataset.size  = 'small';
+  }
+}
+
+// ── DRAG — Comment overlay as a unit ──
+let overlayDragging = false, overlayOffX = 0, overlayOffY = 0;
+function startDragOverlay(e) {
+  if (e.target.classList.contains('win98-btn') ||
+      e.target.classList.contains('aim-tbtn')) return;
+  const overlay = document.getElementById('comment-overlay');
+  const r = overlay.getBoundingClientRect();
+  overlayOffX = e.clientX - r.left;
+  overlayOffY = e.clientY - r.top;
+  overlayDragging = true;
+  e.preventDefault();
+}
+document.addEventListener('mousemove', e => {
+  if (!overlayDragging) return;
+  const overlay = document.getElementById('comment-overlay');
+  overlay.style.left      = (e.clientX - overlayOffX) + 'px';
+  overlay.style.top       = (e.clientY - overlayOffY) + 'px';
+  overlay.style.transform = 'none';
+});
+document.addEventListener('mouseup', () => { overlayDragging = false; });
+
+// ── WINDOW SIZE CONTROLS ──
+function enlargeWindow(id) {
+  const win = document.getElementById(id);
+  if (win) win.classList.add('win-lg');
+}
+function restoreWindow(id) {
+  const win = document.getElementById(id);
+  if (win) win.classList.remove('win-lg');
+}
+
+// ── COMMENTS (localStorage) ──
+const SEED_COMMENTS = [
+  {name:"rafa.k",text:"the dips project is so cool — wish we had something like that at my school. how long did the full build take?",date:"May 28, 2026"},
+  {name:"priya_design",text:"the ell onboarding work genuinely made me emotional. the persona mapping section is really strong research.",date:"Jun 1, 2026"},
+  {name:"marcus_t",text:"love the retro windows aesthetic. the aboutme.txt format is a clever touch.",date:"Jun 3, 2026"},
+  {name:"sofia.m",text:"the modular sneaker case study is so well-argued. the trade-in system idea is genuinely useful.",date:"Jun 5, 2026"},
+  {name:"devlin_j",text:"came here from the technigala presentation — the DIPS site is impressive for a one-week build.",date:"Jun 7, 2026"},
+  {name:"nia.art",text:"your pov on unfinished design really resonated. good luck with version 4!",date:"Jun 9, 2026"}
+];
+function seedComments() {
+  const key = 'portfolio_comments';
+  const vkey = 'portfolio_comments_v';
+  if (localStorage.getItem(vkey) !== 'v3') {
+    localStorage.setItem(key, JSON.stringify(SEED_COMMENTS));
+    localStorage.setItem(vkey, 'v3');
+  }
+}
+seedComments();
+function renderComments() {
+  const list = document.getElementById('comment-list');
+  if (!list) return;
+  const comments = JSON.parse(localStorage.getItem('portfolio_comments') || '[]');
+  if (comments.length === 0) {
+    list.innerHTML = '<span class="comment-empty">no notes yet — be the first!</span>';
+    return;
+  }
+  const nameColors = ['#cc2200','#0033cc'];
+  list.innerHTML = comments.map((c,i) =>
+    `<div class="comment-entry"><span class="comment-date">${c.date}</span><span class="comment-name" style="color:${nameColors[i%2]}">${escapeHtml(c.name || 'Anonymous')}: </span>${escapeHtml(c.text)}</div>`
+  ).join('');
+  list.scrollTop = list.scrollHeight;
+}
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function postComment() {
+  const nameEl = document.getElementById('comment-name');
+  const ta = document.getElementById('comment-input');
+  if (!nameEl || !nameEl.value.trim()) {
+    nameEl.style.border = '2px solid red';
+    nameEl.placeholder = 'please enter your name first!';
+    nameEl.focus();
+    return;
+  }
+  if (!ta || !ta.value.trim()) { ta.focus(); return; }
+  nameEl.style.border = '';
+  const comments = JSON.parse(localStorage.getItem('portfolio_comments') || '[]');
+  comments.push({
+    name: nameEl.value.trim(),
+    text: ta.value.trim(),
+    date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'})
+  });
+  localStorage.setItem('portfolio_comments', JSON.stringify(comments));
+  ta.value = '';
+  nameEl.value = '';
+  renderComments();
+}
+
+// ── GREEN SCREEN REMOVAL (FIX 6) ──
+// Canvas composites video frames with green pixels removed;
+// circular crop is handled by .face-container border-radius:50%
+(function() {
+  const vid    = document.getElementById('face-video');
+  const canvas = document.getElementById('face-canvas');
+  if (!vid || !canvas) return;
+
+  function processFrame() {
+    if (vid.readyState < 2) { requestAnimationFrame(processFrame); return; }
+    const w = vid.videoWidth  || 480;
+    const h = vid.videoHeight || 480;
+    if (canvas.width !== w)  canvas.width  = w;
+    if (canvas.height !== h) canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(vid, 0, 0, w, h);
+    try {
+      const frame = ctx.getImageData(0, 0, w, h);
+      const d = frame.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i+1], b = d[i+2];
+        if (g > 100 && g > r * 1.3 && g > b * 1.3) d[i+3] = 0;
+      }
+      ctx.putImageData(frame, 0, 0);
+    } catch(err) {/* cross-origin guard */ }
+    requestAnimationFrame(processFrame);
+  }
+
+  vid.addEventListener('play', processFrame);
+  vid.addEventListener('loadeddata', () => {
+    vid.play().catch(() => {});
+    if (!vid.paused) processFrame();
+  });
+
+  // Kick off play on first user interaction if autoplay was blocked
+  function tryPlay() {
+    if (vid.paused) vid.play().catch(() => {});
+    document.removeEventListener('click', tryPlay);
+  }
+  document.addEventListener('click', tryPlay);
+
+  // Start processing after a short delay in case video is already loaded
+  setTimeout(() => {
+    vid.play().catch(() => {});
+    processFrame();
+  }, 300);
+})();
+</script>
+</body>
+</html>

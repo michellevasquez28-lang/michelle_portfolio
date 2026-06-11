@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Backup folder
+_originals_backup/
+
+# Editor / IDE
+.vscode/
+.claude/
